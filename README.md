@@ -24,25 +24,40 @@ To install the MCU_FLASHER component, follow these steps:
 
 ## Configuration
 
-### MCU_Flasher Sections
+### Mcu_flasher sections
 
 In your `moonraker.conf` file, add a section for each MCU you want to flash. Here is the template:
 
 ```ini
 [mcu_flasher mcu_name] 
 kconfig: 
-  # Configuration options specific to this MCU
+  # Contains the `menuconfig` options for this mcu.
 flash_cmd:
-  # Command to flash the MCU
-  # Additional commands for flashing others MCUs with the same firmware
+  # Command to flash the MCU (see below for details)
 silent: True  # Enable to suppress all standard output messages
 ```
 
+### flash_cmd examples
+
+These are the exact commands you would typically type in your SSH shell to flash the MCU.
+
+Some examples could be:
+
+- klipper way: `make flash FLASH_DEVICE=/dev/serial/by-id/ID`
+- if using canbus and katapult bootloader: `python3 ~/katapult/scripts/flashtool.py -i can0 -f ~/klipper/out/klipper.bin -u e3e8e93f53df`
+- Or if multiple MCUs use the same firmware, you can flash them in sequence without recompiling Klipper
+
+  ```bash
+  flash_cmd:
+    make flash FLASH_DEVICE=/dev/serial/by-id/ID1
+    make flash FLASH_DEVICE=/dev/serial/by-id/ID2
+  ```
+
 For configuration examples, refer to the [example_mcu_flasher.moonraker.cfg](moonraker/example_mcu_flasher.moonraker.cfg) file in the repository.
 
-## MCUs Flashing
+## Usage / MCU flashing
 
-Type in the Mainsail/Fluidd console:
+You can flash the mcus from the Mainsail/Fluidd console:
 
 - `FLASH_MCU mcu=all` to flash all mcus (in the declared order)
 - `FLASH_MCU mcu=foobar` to flash the mcu named foobar
