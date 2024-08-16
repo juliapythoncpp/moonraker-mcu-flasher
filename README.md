@@ -1,6 +1,6 @@
 # MCU_FLASHER Moonraker Component
 
-This Moonraker component enables the flashing of MCUs via a G-code command.
+This Moonraker component enables the flashing of MCUs via a Klipper command from the Mainsail/Fluidd/KlipperScreen console.
 
 ## Installation
 
@@ -20,7 +20,11 @@ To install the MCU_FLASHER component, follow these steps:
    ln -s moonraker-mcu-flasher/klipper_macro/mcu_flasher.klipper_macro.cfg printer_data/config/macros/mcu_flasher.cfg
    ```
 
+    >⚠️ Ensure that the paths are consistent with your installation
+
 3. Update your `moonraker.conf` file by adding `[mcu_flasher mcu_name]` sections for each MCU you wish to manage.
+
+4. Add `[include macros/mcu_flasher.cfg]` to your `printer.cfg` file.
 
 ## Configuration
 
