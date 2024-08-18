@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from confighelper import ConfigHelper
     from .klippy_apis import KlippyAPI
     from .klippy_connection import KlippyConnection
+    from .machine import Machine
 
 from .shell_command import ShellCommandError
 
@@ -41,8 +42,11 @@ class McuFlasher:
             raise self.server.error("Flashing Refused: Klippy is printing")
         mcu = mcu.lower()
         ks = self.mcus.keys() if mcu == "all" else [mcu]
+        machine: Machine = self.server.lookup_component("machine")
+        await machine.do_service_action("stop", "klipper")
         for m in ks:
             await self.mcus[m].flash()
+        await machine.do_service_action("start", "klipper")
         await self.klippy_api.do_restart("FIRMWARE_RESTART")
 
 class Mcu:
