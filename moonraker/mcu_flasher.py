@@ -37,6 +37,7 @@ class McuFlasher:
                 self.server.add_warning(msg)
                 continue
         self.server.register_remote_method("flash_mcu", self._call_flash_mcu)
+
     async def _call_flash_mcu(self, mcu: str = "all") -> None:
         if self.kconn.is_printing():
             raise self.server.error("Flashing Refused: Klippy is printing")
@@ -53,10 +54,11 @@ class Mcu:
     def __init__(self, name: str, klipper_path: str, config: ConfigHelper):
         self.server = config.get_server()
         self.name: str = name
-        self.klipper_path = klipper_path
+        self.klipper_path = config.get('make_path', klipper_path)
         self.kconfig: str = config.get('kconfig')
         self.flash_cmd: str = config.get('flash_cmd')
         self.silent: bool = config.get('silent', False)
+
     def _make_kconfig(self, kconfig_filename):
         try:
             with open(kconfig_filename, 'w') as f:
@@ -64,11 +66,13 @@ class Mcu:
         except:
             logging.exception("Failed to write kconfig file")
             raise self.server.error("Error writing kconfig file")
+
     def _log(self, msg: str, prefix: Literal['//', '!!'] = '//'):
         marker = '!!' if type=='err' else '//'
         msg = f"{prefix} {msg}"
         logging.info(msg)
         self.server.send_event('server:gcode_response', msg)
+    
     async def _run_cmd(self, cmd: str):
         cmd = cmd.strip(' \n')
         if len(cmd) == 0:
@@ -84,6 +88,7 @@ class Mcu:
             lambda out: self._log(f"  {decode(out)}"),
             lambda err: self._log(f"  {decode(err)}", '!!'),
             timeout=300, log_stderr=True, cwd=self.klipper_path)
+    
     async def flash(self) -> None:
         self._log(f"<<<<<<<<<<<<<<< {self.name}: start flashing... >>>>>>>>>>>>>>")
         try:
@@ -101,5 +106,6 @@ class Mcu:
         except ShellCommandError as e:
             logging.exception(f"Flashing of '{self.name}' failed, stderr: {e.stderr}")
             self._log(f"  {self.name}: flashing FAILED\n", '!!')
+
 def load_component(config: ConfigHelper) -> McuFlasher:
     return McuFlasher(config)

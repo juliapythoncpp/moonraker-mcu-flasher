@@ -33,12 +33,13 @@ To install the MCU_FLASHER component, follow these steps:
 In your `moonraker.conf` file, add a section for each MCU you want to flash. Here is the template:
 
 ```ini
-[mcu_flasher mcu_name] 
+[mcu_flasher mcu_name]
+make_path: # Absolute path to the firmware folder to compile. If ommited defaults to the klipper directory.
 kconfig: 
   # Contains the `menuconfig` options for this mcu.
 flash_cmd:
-  # Command to flash the MCU (see below for details)
-silent: True  # Enable to suppress all standard output messages
+  # Command to flash the MCU (see below for details).
+silent: True  # Enable to suppress all standard output messages.
 ```
 
 ### flash_cmd examples
@@ -49,6 +50,7 @@ Some examples could be:
 
 - klipper way: `make flash FLASH_DEVICE=/dev/serial/by-id/ID`
 - if using canbus and katapult bootloader: `python3 ~/katapult/scripts/flashtool.py -i can0 -f ~/klipper/out/klipper.bin -u e3e8e93f53df`
+- if using usb katapult bootloader first manually enter katapult (double press the reset button by default) and then use: `python3 ~/katapult/scripts/flashtool.py -f ~/klipper/out/klipper.bin -d <device path/hardware path/id path>`
 - Or if multiple MCUs use the same firmware, you can flash them in sequence without recompiling Klipper
 
   ```bash
