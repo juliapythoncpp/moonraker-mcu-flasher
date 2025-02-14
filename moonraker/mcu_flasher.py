@@ -59,8 +59,11 @@ class Mcu:
         self.silent: bool = config.get('silent', False)
     def _make_kconfig(self, kconfig_filename):
         try:
-            with open(kconfig_filename, 'w') as f:
-                f.write(self.kconfig)
+            if os.path.isfile(self.kconfig):
+                shutil.copy(self.kconfig, kconfig_filename)
+            else:
+                with open(kconfig_filename, 'w') as f:
+                    f.write(self.kconfig)
         except:
             logging.exception("Failed to write kconfig file")
             raise self.server.error("Error writing kconfig file")
