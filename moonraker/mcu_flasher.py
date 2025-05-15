@@ -56,7 +56,7 @@ class Mcu:
         self.server = config.get_server()
         self.name: str = name
         self.klipper_path = klipper_path
-        self.kconfig: str = config.get('kconfig')
+        self.kconfig: str = config.get('kconfig').strip()
         self.flash_cmd: str = config.get('flash_cmd')
         self.silent: bool = config.get('silent', False)
     def _make_kconfig(self, kconfig_filename):
