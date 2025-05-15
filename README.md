@@ -35,10 +35,28 @@ In your `moonraker.conf` file, add a section for each MCU you want to flash. Her
 ```ini
 [mcu_flasher mcu_name] 
 kconfig: 
-  # Contains the `menuconfig` options for this mcu.
+  # Contains the `menuconfig` options or `menuconfig` file path for this mcu.
 flash_cmd:
   # Command to flash the MCU (see below for details)
 silent: True  # Enable to suppress all standard output messages
+```
+
+Example for the `menuconfig` options:
+```ini
+[mcu_flasher linux]
+kconfig:
+  CONFIG_LOW_LEVEL_OPTIONS=y
+  CONFIG_MACH_LINUX=y
+flash_cmd: 
+  make flash
+```
+or it can point to the the `menuconfig` file:
+```ini
+[mcu_flasher linux]
+kconfig:
+  ~/klipper/linux.config
+flash_cmd: 
+  make flash
 ```
 
 ### flash_cmd examples
