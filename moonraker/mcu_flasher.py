@@ -61,7 +61,7 @@ class Mcu:
         self.silent: bool = config.get('silent', False)
     def _make_kconfig(self, kconfig_filename):
         try:
-            src = os.path.expanduser(self.kconfig)
+            src = os.path.expanduser(self.kconfig).strip()
             if not os.path.isabs(src):
                 src = os.path.join(self.klipper_path, src)
             if os.path.isfile(src):
