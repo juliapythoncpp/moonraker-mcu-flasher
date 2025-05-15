@@ -1,6 +1,8 @@
 from __future__ import annotations
 import logging
 import os
+import shutil
+import subprocess
 
 # Annotation imports
 from typing import (
@@ -59,12 +61,26 @@ class Mcu:
         self.silent: bool = config.get('silent', False)
     def _make_kconfig(self, kconfig_filename):
         try:
-            if os.path.isfile(self.kconfig):
-                shutil.copy(self.kconfig, kconfig_filename)
+            src = os.path.expanduser(self.kconfig)
+            if not os.path.isabs(src):
+                src = os.path.join(self.klipper_path, src)
+            if os.path.isfile(src):
+                shutil.copy(src, kconfig_filename)
             else:
-                with open(kconfig_filename, 'w') as f:
+                tmp = os.path.join(self.klipper_path, ".defconfig.tmp")
+                with open(tmp, "w") as f:
                     f.write(self.kconfig)
-        except:
+                shutil.copy(tmp, kconfig_filename)
+            env = os.environ.copy()
+            env["KCONFIG_CONFIG"] = kconfig_filename
+            kconf_script = os.path.join(self.klipper_path, "lib", "kconfiglib", "olddefconfig.py")
+            kconfig_src   = os.path.join(self.klipper_path, "src", "Kconfig")
+            subprocess.check_call(
+                ["python3", kconf_script, kconfig_src],
+                cwd=self.klipper_path,
+                env=env
+            )
+        except Exception:
             logging.exception("Failed to write kconfig file")
             raise self.server.error("Error writing kconfig file")
     def _log(self, msg: str, prefix: Literal['//', '!!'] = '//'):
