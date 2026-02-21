@@ -53,10 +53,11 @@ class McuFlasher:
             self.server.send_event('server:gcode_response', f"!! {msg}")
             raise self.server.error(msg)
         machine: Machine = self.server.lookup_component("machine")
-        await machine.do_service_action("stop", "klipper")
+        klipper_svc_name = self.kconn.unit_name
+        await machine.do_service_action("stop", klipper_svc_name)
         for m in ks:
             await self.mcus[m].flash()
-        await machine.do_service_action("start", "klipper")
+        await machine.do_service_action("start", klipper_svc_name)
         await self.klippy_api.do_restart("FIRMWARE_RESTART")
 
 class Mcu:
